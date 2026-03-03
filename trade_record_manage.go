@@ -40,18 +40,23 @@ type Stats struct {
 }
 
 func main() {
-	// wjwy
-	GenerateCsv("./data/wjwy.csv", "./data/wjwy_agg_minute.csv", "./data/wjwy_agg_day.csv")
-	GenerateTdxDayCode("./data/wjwy_agg_day.csv", "./data/wjwy_tdx_day.txt")
-	GenerateTdxMinCode("./data/wjwy_agg_minute.csv", "./data/wjwy_tdx_min.txt")
-	//92kebi
-	GenerateCsv("./data/92kebi.csv", "./data/92kebi_agg_minute.csv", "./data/92kebi_agg_day.csv")
-	GenerateTdxDayCode("./data/92kebi_agg_day.csv", "./data/92kebi_tdx_day.txt")
-	GenerateTdxMinCode("./data/92kebi_agg_minute.csv", "./data/92kebi_tdx_min.txt")
-	//txcg
-	GenerateCsv("./data/txcg.csv", "./data/txcg_agg_minute.csv", "./data/txcg_agg_day.csv")
-	GenerateTdxDayCode("./data/txcg_agg_day.csv", "./data/txcg_tdx_day.txt")
-	GenerateTdxMinCode("./data/txcg_agg_minute.csv", "./data/txcg_tdx_min.txt")
+	// // wjwy
+	// GenerateCsv("./data/wjwy.csv", "./data/wjwy_agg_minute.csv", "./data/wjwy_agg_day.csv")
+	// GenerateTdxDayCode("./data/wjwy_agg_day.csv", "./data/wjwy_tdx_day.txt")
+	// GenerateTdxMinCode("./data/wjwy_agg_minute.csv", "./data/wjwy_tdx_min.txt")
+	// //92kebi
+	// GenerateCsv("./data/92kebi.csv", "./data/92kebi_agg_minute.csv", "./data/92kebi_agg_day.csv")
+	// GenerateTdxDayCode("./data/92kebi_agg_day.csv", "./data/92kebi_tdx_day.txt")
+	// GenerateTdxMinCode("./data/92kebi_agg_minute.csv", "./data/92kebi_tdx_min.txt")
+	// //txcg
+	// GenerateCsv("./data/txcg.csv", "./data/txcg_agg_minute.csv", "./data/txcg_agg_day.csv")
+	// GenerateTdxDayCode("./data/txcg_agg_day.csv", "./data/txcg_tdx_day.txt")
+	// GenerateTdxMinCode("./data/txcg_agg_minute.csv", "./data/txcg_tdx_min.txt")
+
+	//guiyin
+	GenerateCsv("./data/guiyin.csv", "./data/guiyin_agg_minute.csv", "./data/guiyin_agg_day.csv")
+	GenerateTdxDayCode("./data/guiyin_agg_day.csv", "./data/guiyin_tdx_day.txt", 1)
+	GenerateTdxMinCode("./data/guiyin_agg_minute.csv", "./data/guiyin_tdx_min.txt")
 }
 
 func GenerateCsv(inputFile, outputmin, outputday string) {
@@ -160,7 +165,7 @@ func GenerateCsv(inputFile, outputmin, outputday string) {
 	fmt.Println("2. agg_day.csv (天级)")
 }
 
-func GenerateTdxDayCode(inputFile, outputFile string) {
+func GenerateTdxDayCode(inputFile, outputFile string, nSortType int) {
 	// 1. 打开传入的 CSV 文件
 	//inputFile := "./data/wjwy_day.csv"
 	file, err := os.Open(inputFile)
@@ -199,13 +204,24 @@ func GenerateTdxDayCode(inputFile, outputFile string) {
 		return
 	}
 
-	sort.Slice(records, func(i, j int) bool {
-		// 防止越界检查（可选，如果数据保证规范可省略）
-		if len(records[i]) <= 2 || len(records[j]) <= 2 {
-			return false
-		}
-		return records[i][1] < records[j][1]
-	})
+	if nSortType == 1 { //按代码排序
+		sort.Slice(records, func(i, j int) bool {
+			// 防止越界检查（可选，如果数据保证规范可省略）
+			if len(records[i]) <= 2 || len(records[j]) <= 2 {
+				return false
+			}
+			return records[i][1] < records[j][1]
+		})
+	} else if nSortType == 2 { //按时间排序
+		sort.Slice(records, func(i, j int) bool {
+			// 防止越界检查（可选，如果数据保证规范可省略）
+			if len(records[i]) <= 2 || len(records[j]) <= 2 {
+				return false
+			}
+
+			return records[i][0] < records[j][0]
+		})
+	}
 
 	// 5. 遍历每一行数据进行处理
 	for _, row := range records {
